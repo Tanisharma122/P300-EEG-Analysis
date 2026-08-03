@@ -1,5 +1,9 @@
-﻿# Large data files (exceed GitHub's 100MB limit)
+# Large data files (exceed GitHub's 100MB limit)
 *.mat
+
+# Generated figure outputs (reproducible, not source)
+*.png
+p300_figures_*/
 
 # Python cache
 __pycache__/
