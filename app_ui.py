@@ -415,12 +415,12 @@ if _QT_AVAILABLE:
             self._lbl_dataset = QLabel(f"📁  {self.mat_path.name}")
             self._lbl_dataset.setStyleSheet(f"color:{C_TEXT_LIGHT}; font-size:12px;")
 
-            # Buttons
-            self._btn_train  = self._make_btn("⚙  Train Model",  "btnSecondary")
-            self._btn_load   = self._make_btn("📂  Load Model",   "btnSecondary")
-            self._btn_start  = self._make_btn("▶  Start Spelling","btnPrimary")
-            self._btn_stop   = self._make_btn("⏹  Stop",          "btnDanger")
-            self._btn_reset  = self._make_btn("↺  Reset",         "btnSecondary")
+            # Buttons (short labels so they always fit in toolbar)
+            self._btn_train  = self._make_btn("⚙ Train",   "btnSecondary")
+            self._btn_load   = self._make_btn("📂 Load",    "btnSecondary")
+            self._btn_start  = self._make_btn("▶ Start",   "btnPrimary")
+            self._btn_stop   = self._make_btn("⏹ Stop",    "btnDanger")
+            self._btn_reset  = self._make_btn("↺ Reset",   "btnSecondary")
 
             self._btn_train.setToolTip("Train LDA + xDAWN pipeline (5-fold CV, ~2 min)")
             self._btn_load.setToolTip("Load existing p300_lda_model.pkl")
@@ -481,6 +481,25 @@ if _QT_AVAILABLE:
             self._lbl_flash_info.setStyleSheet(
                 f"color:{C_TEXT_LIGHT}; font-size:11px; font-style:italic;")
             vl.addWidget(self._lbl_flash_info)
+
+            # ── BIG START SPELLING BUTTON (always visible below grid) ──
+            self._btn_start_big = QPushButton("▶  Start Spelling Simulation")
+            self._btn_start_big.setObjectName("btnPrimary")
+            self._btn_start_big.setFont(QFont("Segoe UI", 14, QFont.Weight.Bold))
+            self._btn_start_big.setFixedHeight(48)
+            self._btn_start_big.setCursor(Qt.CursorShape.PointingHandCursor)
+            self._btn_start_big.setEnabled(False)
+            self._btn_start_big.setToolTip(f"Run {N_REPS} repetitions × 12 flash groups")
+            self._btn_start_big.clicked.connect(self._on_start)
+            self._btn_start_big.setStyleSheet(
+                f"QPushButton {{ background: qlineargradient(x1:0,y1:0,x2:1,y2:0,"
+                f"stop:0 {C_ACCENT},stop:1 {C_ACCENT2}); color:white; border:none;"
+                f"border-radius:10px; font-size:14px; font-weight:700; padding:8px 20px; }}"
+                f"QPushButton:hover {{ background: qlineargradient(x1:0,y1:0,x2:1,y2:0,"
+                f"stop:0 #3551DD,stop:1 #6A20A8); }}"
+                f"QPushButton:disabled {{ background:#ADB5BD; color:white; }}"
+            )
+            vl.addWidget(self._btn_start_big)
 
             return frame
 
@@ -632,6 +651,7 @@ if _QT_AVAILABLE:
                 self._prep_result = load_and_preprocess(self.mat_path, verbose=False)
                 self._log(f"✅ Data ready: {self._prep_result.summary()}")
                 self._btn_start.setEnabled(True)
+                self._btn_start_big.setEnabled(True)
             except Exception as exc:
                 self._log(f"❌ Data load failed: {exc}")
 
@@ -646,6 +666,7 @@ if _QT_AVAILABLE:
             self._lbl_model_status.setText(texts.get(state, state))
             if state == "ready":
                 self._btn_start.setEnabled(True)
+                self._btn_start_big.setEnabled(True)
 
         # ── Button handlers ────────────────────────────────────────────────
 
@@ -657,6 +678,7 @@ if _QT_AVAILABLE:
             self._set_model_status("training")
             self._btn_train.setEnabled(False)
             self._btn_start.setEnabled(False)
+            self._btn_start_big.setEnabled(False)
 
             self._train_worker = TrainWorker(self.mat_path, self.model_path)
             self._train_worker.finished.connect(self._on_train_done)
@@ -705,6 +727,7 @@ if _QT_AVAILABLE:
 
             self._running = True
             self._btn_start.setEnabled(False)
+            self._btn_start_big.setEnabled(False)
             self._btn_stop.setEnabled(True)
             self._btn_train.setEnabled(False)
             self._btn_reset.setEnabled(False)
@@ -724,6 +747,7 @@ if _QT_AVAILABLE:
             self._flash_timer.stop()
             self._clear_flash()
             self._btn_start.setEnabled(True)
+            self._btn_start_big.setEnabled(True)
             self._btn_stop.setEnabled(False)
             self._btn_train.setEnabled(True)
             self._btn_reset.setEnabled(True)
@@ -877,6 +901,7 @@ if _QT_AVAILABLE:
         def _after_round(self) -> None:
             self._running = False
             self._btn_start.setEnabled(True)
+            self._btn_start_big.setEnabled(True)
             self._btn_stop.setEnabled(False)
             self._btn_train.setEnabled(True)
             self._btn_reset.setEnabled(True)
