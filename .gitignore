@@ -1,4 +1,4 @@
-﻿# Large data files (exceed GitHub's 100MB limit)
+# Large data files (exceed GitHub's 100MB limit)
 *.mat
 
 # Python cache
@@ -18,3 +18,15 @@ env/
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+
+# Pytest / coverage
+.pytest_cache/
+htmlcov/
+.coverage
+
+
